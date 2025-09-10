@@ -62,13 +62,15 @@ def reachability_of(s: int, G: list[list[int]]) -> list[int]:
 
 def find_smallest_edge(G, T):
     smallest = float("inf")
-    res = None
+    row = None
+    col = None
     for r in range(len(G)):
         for c in range(len(G)):
             if G[r][c] < smallest and G[r][c] != G[0][0] and T[r][c] == 0:
-                res = (r, c)
+                row = r
+                col = c
                 smallest = G[r][c]
-    return res[0], res[1], smallest
+    return row, col, smallest
 
 
 graph = [
