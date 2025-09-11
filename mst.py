@@ -1,4 +1,10 @@
-def min_span_tree(G):
+def min_span_tree(G: list[list[int]]) -> list[list[int]]:
+    """
+    input:
+        G (list[list[int]]): input edge graphed
+    returns:
+        T (list[list[int]]): minimum spanning tree
+    """
     T: list[list[int]] = create_edgeless_copy(G)
     component_count, component_map = count_components(T)
     while component_count > 2:
