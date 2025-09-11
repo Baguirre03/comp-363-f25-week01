@@ -3,7 +3,7 @@ def min_span_tree(G):
     component_count, component_map = count_components(T)
     while component_count > 2:
         component_count, component_map = count_components(T)
-        row, column, weight = find_smallest_edge(G, T)
+        row, column, weight = find_smallest_edge(component_map, G, T)
         T[row][column] = weight
         T[column][row] = weight
 
@@ -34,6 +34,7 @@ def count_components(T: list[list[int]]) -> tuple[int, list[int]]:
     count: int = 0
     components_map: list[int] = [None] * len(T)
     visited: set[int] = set()
+
     for v in range(len(T)):
         if v not in visited:
             count += 1
@@ -60,25 +61,60 @@ def reachability_of(s: int, G: list[list[int]]) -> list[int]:
     return reach
 
 
-def find_smallest_edge(G, T):
+def find_smallest_edge(component_map, G, T):
     smallest = float("inf")
     row = None
     col = None
-    for r in range(len(G)):
-        for c in range(len(G)):
-            if G[r][c] < smallest and G[r][c] != G[0][0] and T[r][c] == 0:
-                row = r
-                col = c
-                smallest = G[r][c]
+    indexes_1 = list(
+        filter(
+            lambda x: x != -1,
+            [index if val == 1 else -1 for index, val in enumerate(component_map)],
+        )
+    )
+    indexes_2 = list(
+        filter(
+            lambda x: x != -1,
+            [index if val == 2 else -1 for index, val in enumerate(component_map)],
+        )
+    )
+    for index_1 in indexes_1:
+        for index_2 in indexes_2:
+            if (
+                G[index_1][index_2] < smallest
+                and T[index_1][index_2] == 0
+                and G[index_1][index_2] != G[0][0]
+            ):
+                smallest = G[index_1][index_2]
+                row = index_1
+                col = index_2
     return row, col, smallest
 
 
-graph = [
-    [0, 4, 0, 0, 9],
-    [4, 0, 3, 7, 0],
-    [0, 3, 0, 2, 5],
-    [0, 7, 2, 0, 6],
-    [9, 0, 5, 6, 0],
+graphs = [
+    [
+        [0, 2, 0, 6, 0],
+        [2, 0, 3, 8, 5],
+        [0, 3, 0, 0, 7],
+        [6, 8, 0, 0, 9],
+        [0, 5, 7, 9, 0],
+    ],
+    [
+        [0, 3, 0, 0, 0, 1],
+        [3, 0, 2, 1, 10, 0],
+        [0, 2, 0, 3, 0, 5],
+        [0, 1, 3, 0, 5, 0],
+        [0, 10, 0, 5, 0, 4],
+        [1, 0, 5, 0, 4, 0],
+    ],
+    [
+        [0, 2, 3, 0, 6],
+        [2, 0, 4, 5, 0],
+        [3, 4, 0, 7, 8],
+        [0, 5, 7, 0, 9],
+        [6, 0, 8, 9, 0],
+    ],
+    [[0, 1, 4, 0], [1, 0, 2, 6], [4, 2, 0, 3], [0, 6, 3, 0]],
 ]
 
-print(min_span_tree(graph))
+for indx, graph in enumerate(graphs):
+    print(indx, min_span_tree(graph))
