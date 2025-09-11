@@ -19,7 +19,7 @@ def create_edgeless_copy(G: list[list[int]]) -> list[list]:
     LOCAL_INFINITY = G[0][0]
     n: int = len(G)
     m: int = len(G[0])
-    return [[LOCAL_INFINITY for c in range(m)] for r in range(n)]
+    return [[LOCAL_INFINITY for _ in range(m)] for _ in range(n)]
 
 
 def count_components(T: list[list[int]]) -> tuple[int, list[int]]:
@@ -47,7 +47,12 @@ def count_components(T: list[list[int]]) -> tuple[int, list[int]]:
 
 
 def reachability_of(s: int, G: list[list[int]]) -> list[int]:
-    """ """
+    """
+    Returns reachability of current node, used to find components in graph
+    input:
+        s (int): starting node
+        g (list[list[int]]): original graph
+    """
     LOCAL_INFINITY = G[0][0]
     reach: list[int] = []  # return object
     visit_next: list[int] = [s]  # place to store which vertex to visit
@@ -61,35 +66,36 @@ def reachability_of(s: int, G: list[list[int]]) -> list[int]:
     return reach
 
 
-def find_smallest_edge(component_map, G, T):
-    smallest = float("inf")
-    row = None
-    col = None
-    indexes_1 = list(
-        filter(
-            lambda x: x != -1,
-            [index if val == 1 else -1 for index, val in enumerate(component_map)],
-        )
-    )
-    indexes_2 = list(
-        filter(
-            lambda x: x != -1,
-            [index if val == 2 else -1 for index, val in enumerate(component_map)],
-        )
-    )
-    for index_1 in indexes_1:
-        for index_2 in indexes_2:
-            if (
-                G[index_1][index_2] < smallest
-                and T[index_1][index_2] == 0
-                and G[index_1][index_2] != G[0][0]
-            ):
-                smallest = G[index_1][index_2]
-                row = index_1
-                col = index_2
+def find_smallest_edge(
+    component_map: list[int], G: list[list[int]], T: list[list[int]]
+) -> tuple[int, int, int]:
+    """
+    input:
+        component_map: the map of nodes representend by their list[node] = component they are a part of
+        G: original graph input which carries edge weights
+        T: Edgeless graph input which we return
+    output:
+        tuple[int,int,int]:
+        [0]: row of smallest edge
+        [1]: col of smallest edge
+        [2]: weight of smallest edge of separate components
+    """
+    smallest: int = float("inf")
+    row: int | None = None
+    col: int | None = None
+    for index, comp in enumerate(component_map):
+        for index_2, other_comp in enumerate(component_map):
+            # if different components, and graph has an edge and T is not already connected
+            if comp != other_comp and G[index][index_2] and not T[index][index_2]:
+                if G[index][index_2] < smallest:
+                    smallest = G[index][index_2]
+                    row = index
+                    col = index_2
+
     return row, col, smallest
 
 
+# TESTING IGNORE
 graphs = [
     [
         [0, 2, 0, 6, 0],
@@ -117,4 +123,10 @@ graphs = [
 ]
 
 for indx, graph in enumerate(graphs):
-    print(indx, min_span_tree(graph))
+    for arr in graph:
+        print(arr)
+    print("------------")
+    res = min_span_tree(graph)
+    for arr in res:
+        print(arr)
+    print("------------")
