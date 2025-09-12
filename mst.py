@@ -87,16 +87,18 @@ def find_smallest_edge(
         [2]: weight of smallest edge of separate components
     """
     smallest: int = float("inf")
-    row: int | None = None
-    col: int | None = None
-    for index, comp in enumerate(component_map):
-        for index_2, other_comp in enumerate(component_map):
-            # if different components, and graph has an edge and T is not already connected
-            if comp != other_comp and G[index][index_2] and not T[index][index_2]:
-                if G[index][index_2] < smallest:
-                    smallest = G[index][index_2]
-                    row = index
-                    col = index_2
+    row: int = -1
+    col: int = -1
+    for i in range(len(component_map)):
+        for j in range(i + 1, len(component_map)):
+            # if that are the same component continue
+            if component_map[i] == component_map[j]:
+                continue
+            # if different components, and graph has an edge less than the current smallest
+            if G[i][j] and G[i][j] < smallest:
+                smallest = G[i][j]
+                row = i
+                col = j
 
     return row, col, smallest
 
